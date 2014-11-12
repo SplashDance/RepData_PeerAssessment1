@@ -98,6 +98,20 @@ mean.steps <- mean(daily.tot$totals)
 median.steps <- median(daily.tot$totals)
 max.steps <- max(daily.tot$totals)
 min.steps <- min(daily.tot$totals)
+
+print(mean.steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
+print(median.steps)
+```
+
+```
+## [1] 10765
 ```
 As we can see from the histogram, the distribution of total steps per day appears to be fairly symmetric, supported by the fact that the **mean** number of steps per day (10766.2) and the **median** (10765 steps) are very close to each other (the difference is only about 1.2 days).    
 
@@ -173,13 +187,28 @@ daily.imputed <- imputed.df %>%
 med.steps.imp <- median(daily.imputed$totals)
 mean.steps.imp <- mean(daily.imputed$totals)
 
+print(med.steps.imp)
+```
+
+```
+## [1] 10762
+```
+
+```r
+print(mean.steps.imp)
+```
+
+```
+## [1] 10765.64
+```
+
+```r
 # Plot a NEW histogram
 hist(x=daily.imputed$totals, col='lightblue', xlab='Total Steps',
      main='Histogram of Total Steps per Day\n(with Imputed Values)')
 ```
 
 ![plot of chunk imputation](figure/imputation-1.png) 
-
 
 Here we see that the (imputed) mean number of steps per day (10765.6) and (imputed) median (10762 steps) are nearly identical to our initial calculations (in fact, the slight discrepancy occurs because we use the *rounded* mean steps per interval). Although this result may at first glance seem counter-intuitive (after all, the whole point of imputation is to *remove* bias and yet our new estimates are nearly identical to those previously calculated), it makes more sense when you reconsider the structure of the missing data. Indeed, since there does not appear to be anything *systematic* about the missing values (all intervals are equally represented and both weekends and weekdays are represented as well) our resulting calculations seem reasonable. 
 
@@ -226,9 +255,10 @@ sessionInfo()
 ## loaded via a namespace (and not attached):
 ##  [1] assertthat_0.1   colorspace_1.2-4 DBI_0.3.1        digest_0.6.4    
 ##  [5] evaluate_0.5.5   formatR_1.0      grid_3.1.1       gtable_0.1.2    
-##  [9] labeling_0.3     lazyeval_0.1.9   magrittr_1.0.1   markdown_0.7.4  
-## [13] MASS_7.3-35      memoise_0.2.1    mime_0.2         munsell_0.4.2   
-## [17] parallel_3.1.1   plyr_1.8.1       proto_0.3-10     Rcpp_0.11.3     
-## [21] reshape2_1.4     scales_0.2.4     tools_3.1.1
+##  [9] htmltools_0.2.6  labeling_0.3     lazyeval_0.1.9   magrittr_1.0.1  
+## [13] markdown_0.7.4   MASS_7.3-35      memoise_0.2.1    mime_0.2        
+## [17] munsell_0.4.2    parallel_3.1.1   plyr_1.8.1       proto_0.3-10    
+## [21] Rcpp_0.11.3      reshape2_1.4     rmarkdown_0.3.3  scales_0.2.4    
+## [25] tools_3.1.1      yaml_2.1.13
 ```
 
