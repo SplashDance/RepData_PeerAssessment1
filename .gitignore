@@ -1,6 +1,7 @@
 .Rproj.user
 .Rhistory
 .RData
+*.csv
 
 *-aux.temp.R
 Reproducible Research | Coursera - Project #1.pdf
