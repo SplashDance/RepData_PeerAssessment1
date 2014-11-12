@@ -99,7 +99,9 @@ median.steps <- median(daily.tot$totals)
 max.steps <- max(daily.tot$totals)
 min.steps <- min(daily.tot$totals)
 ```
-As we can see from the histogram, the distribution of total steps per day appears to be fairly symmetric, supported by the fact that the **mean** number of steps per day (10766.2) and the median (10765 steps) are very close to each other (the difference is only about 1.2 days). [An interesting side note is that the two most active days occurred on 11/22 and 11/23--the day of and the day after **Thanksgiving**]
+As we can see from the histogram, the distribution of total steps per day appears to be fairly symmetric, supported by the fact that the **mean** number of steps per day (10766.2) and the **median** (10765 steps) are very close to each other (the difference is only about 1.2 days).    
+
+An interesting side note is that the two most active days occurred on 11/22 and 11/23--the day of and the day after **Thanksgiving**.
 
 ## What is the average daily activity pattern?
 
@@ -132,6 +134,11 @@ axis(side=1, at=new.idx, strftime(x=date.idx, format='%l:00%P'))
 
 ```r
 max.interval <- daily$interval[which.max(daily$mean.steps)]
+print(max.interval)
+```
+
+```
+## [1] 835
 ```
 In this plot we can see that clearly the most active time of day for the subject is in the morning (with the interval 835--the 5-minute interval from 8:35am to 8:40am--containing the most steps on average), most likely the result of a frantic rush to get ready for work. Additionally, I've included a plot of the *median* number of steps taken per interval, which will will be helpful when considering the appropriate imputation strategy as we will do next.
 
@@ -196,4 +203,32 @@ g
 ```
 
 ![plot of chunk wkend_vs_wkday](figure/wkend_vs_wkday-1.png) 
+
+
+```r
+sessionInfo()
+```
+
+```
+## R version 3.1.1 (2014-07-10)
+## Platform: x86_64-apple-darwin13.1.0 (64-bit)
+## 
+## locale:
+## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] knitr_1.7       ggplot2_1.0.0   dplyr_0.3.0.2   lubridate_1.3.3
+## [5] stringr_0.6.2  
+## 
+## loaded via a namespace (and not attached):
+##  [1] assertthat_0.1   colorspace_1.2-4 DBI_0.3.1        digest_0.6.4    
+##  [5] evaluate_0.5.5   formatR_1.0      grid_3.1.1       gtable_0.1.2    
+##  [9] labeling_0.3     lazyeval_0.1.9   magrittr_1.0.1   markdown_0.7.4  
+## [13] MASS_7.3-35      memoise_0.2.1    mime_0.2         munsell_0.4.2   
+## [17] parallel_3.1.1   plyr_1.8.1       proto_0.3-10     Rcpp_0.11.3     
+## [21] reshape2_1.4     scales_0.2.4     tools_3.1.1
+```
 

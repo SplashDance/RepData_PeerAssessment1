@@ -72,7 +72,9 @@ median.steps <- median(daily.tot$totals)
 max.steps <- max(daily.tot$totals)
 min.steps <- min(daily.tot$totals)
 ```
-As we can see from the histogram, the distribution of total steps per day appears to be fairly symmetric, supported by the fact that the **mean** number of steps per day (`r round(mean.steps, 1)`) and the median (`r median.steps` steps) are very close to each other (the difference is only about `r round(mean.steps - median.steps, 1)` days). [An interesting side note is that the two most active days occurred on 11/22 and 11/23--the day of and the day after **Thanksgiving**]
+As we can see from the histogram, the distribution of total steps per day appears to be fairly symmetric, supported by the fact that the **mean** number of steps per day (`r round(mean.steps, 1)`) and the **median** (`r median.steps` steps) are very close to each other (the difference is only about `r round(mean.steps - median.steps, 1)` days).    
+
+An interesting side note is that the two most active days occurred on 11/22 and 11/23--the day of and the day after **Thanksgiving**.
 
 ## What is the average daily activity pattern?
 
@@ -100,6 +102,7 @@ date.idx <- pretty_dates(date.idx, n=6)
 axis(side=1, at=new.idx, strftime(x=date.idx, format='%l:00%P'))
 
 max.interval <- daily$interval[which.max(daily$mean.steps)]
+print(max.interval)
 ```
 In this plot we can see that clearly the most active time of day for the subject is in the morning (with the interval `r max.interval`--the 5-minute interval from 8:35am to 8:40am--containing the most steps on average), most likely the result of a frantic rush to get ready for work. Additionally, I've included a plot of the *median* number of steps taken per interval, which will will be helpful when considering the appropriate imputation strategy as we will do next.
 
@@ -158,5 +161,9 @@ g <- ggplot(data=imputed.df, aes(x=idx, y=steps, colour=wk.part)) +
                         breaks=new.idx) +
      guides(colour=FALSE) + theme(plot.title = element_text(size=14))
 g
+```
+
+```{r session_info}
+sessionInfo()
 ```
 
