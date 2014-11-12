@@ -4,17 +4,133 @@
 ## Loading and preprocessing the data
 
 
+Before beginning our analysis, we first must load the appropriate packages for our analysis. These include:
+
+* **stringr** for manipulating strings during our pre-processing step
+* **lubridate** for date parsing
+* **dplyr**, which allows us to easily manipulate/transform our data frames.
+* **ggplot2**, for plotting (though we'll also use *base* graphics for plotting as well)
+
+In addition, we'll also use this chunk to unzip the "activity.zip" file that came with this forked repository. [Note: This assumes that you are already in the appropriate working directory].
+
+```{r loading_packages, message=FALSE}
+library(stringr)
+library(lubridate)
+library(dplyr)
+library(ggplot2)
+
+unzip("activity.zip")
+```
+
+```{r preprocessing}
+
+activity <- read.csv('activity.csv', stringsAsFactors=FALSE)
+# Process data: add POSIX date.time & rearrange columns
+interval <- str_pad(activity$interval, width=4, side='left', '0')
+activity$date.time <- paste(activity$date, interval)
+activity$date.time <- ymd_hm(activity$date.time)
+# activity$date <- floor_date(activity$date.time, 'day')
+activity$wk.day <- wday(activity$date.time, label=TRUE)
+activity$wk.part <- ifelse(activity$wk.day == 'Sat' | activity$wk.day == 'Sun',
+                           'Weekend', 'Weekday')
+activity <- activity[, c(4,2,5,6,3,1)]
+activity$idx <- 1:288
+
+# Ignoring the missing values:
+idx.complete <- complete.cases(activity)
+df.ignored <- activity[idx.complete, ]
+daily.tot <- df.ignored %>%
+             group_by(date) %>%
+             summarise(totals = sum(steps, na.rm = TRUE))
+
+# Plot histogram:
+hist(x=daily.tot$totals, col='lightgreen', xlab='Total Steps',
+     main='Histogram of Total Steps per Day\n(Excluding Missing Values)')
+```
 
 ## What is mean total number of steps taken per day?
 
-
+```{r mean_totals}
+mean.steps <- mean(daily.tot$totals)
+median.steps <- median(daily.tot$totals)
+```
+Here we have the result that the **mean** number of steps is `r mean.steps` whereas the median number of steps taken per day is `r median.steps`.
 
 ## What is the average daily activity pattern?
 
+```{r avg_activity_pattern}
+
+daily <- activity %>%
+         group_by(interval) %>%
+         summarise(mean.steps = mean(steps, na.rm=TRUE),
+                   median.steps = median(steps, na.rm=TRUE))
+
+# Plot daily behavior
+# Note: labs suppressed in plot function & xaxt='n' supresses x-axis output
+plot(x=1:NROW(daily), y=daily$mean.steps, type='l', col='darkblue',
+     xlab=NA, ylab=NA, xaxt='n')
+title(ylab='Avg. Steps', xlab='Time', main='Average Steps Taken Throughout the Day')
+
+# Must create a vector of times to plot on x-axis
+new.idx <- seq(from=1, to=288, length.out=7)
+# Creates sequence of (pretty) hours and plots them on x-axis
+date.idx <- seq.POSIXt(from=activity[1,1], by='hour', length.out=24)
+date.idx <- pretty_dates(date.idx, n=6)
+axis(side=1, at=new.idx, strftime(x=date.idx, format='%l:00%P'))
+
+max.interval <- daily$interval[which.max(daily$mean.steps)]
+```
+Here we see that the interval containing the maximum number of steps is `r max.interval`, implying that the time is 8:35am.
 
 
 ## Imputing missing values
 
+```{r imputation}
+# Number of missing values (2304 total)
+na.idx <- is.na(activity$steps)
+num.na <- sum(na.idx)
+
+# Imputation strategy: replace missing values with median at interval
+    # --> this is more robust than the (skewed) metric of avg
+    # --> further separate by weekend vs. weekday??
+
+# Create an "imputation matrix" that will work like a Python Dictionary
+imp.mat <- matrix(data=daily$median.steps, ncol=1)
+row.names(imp.mat) <- as.character(daily$interval)
+
+# Create a new data.frame, "imputed.df" that will contain the imputed values
+imputed.df <- activity
+# "na.df" is a data.frame containing only those rows with an NA value
+na.df <- imputed.df[na.idx, ]
+# Here I pass in a character vector of indexes of NA values
+na.df$steps <- imp.mat[as.character(na.df$interval), 1]
+imputed.df[na.idx, ] <- na.df
+
+
+daily.imputed <- imputed.df %>%
+                 group_by(date) %>%
+                 summarise(totals = sum(steps, na.rm = TRUE))
+
+med.steps.imp <- median(daily.imputed$totals)
+mean.steps.imp <- mean(daily.imputed$totals)
+
+
+# Plot a NEW histogram
+hist(x=daily.imputed$totals, col='lightblue', xlab='Total Steps',
+     main='Histogram of Total Steps per Day\n(with Imputed Values)')
+```
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+```{r wkend_vs_wkday}
+
+g <- ggplot(data=imputed.df, aes(x=idx, y=steps, colour=wk.part)) +
+     stat_summary(geom='line', fun.y='mean', na.rm=TRUE) +
+     facet_grid(wk.part~.) + xlab(label='Time') + ylab('Avg. Number of Steps') +
+     ggtitle('Weekday vs. Weekend Walking Patterns\n') +
+     scale_x_continuous(label=strftime(x=date.idx, format='%l:00%P'), breaks=new.idx) +
+     guides(colour=FALSE) + theme(plot.title = element_text(size=12))
+g
+```
+
